@@ -1,45 +1,51 @@
-# Meatzaritza Data Labs — Especulómetro Vasco 🔬 lsh
-> **Suite Tri-Modular Multiplataforma de Contra-Auditoría Territorial y Predicción del Suelo Residencial en Euskadi**
+# 🔬 Especulómetro Vasco | Meatzaritza Urban Suite
+> **End-to-End Machine Learning MVP para auditar el impacto sociodemográfico de las Viviendas de Uso Turístico (VUT) en Euskadi.**
+
+![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.12-14354C?style=for-the-badge&logo=python&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/Scikit_Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-172434?style=for-the-badge)
+
+Este repositorio contiene la arquitectura completa (Data Pipeline, Modelos Predictivos, API Backend y Web App Frontend) de una herramienta diseñada para fiscalizar el mercado inmobiliario vasco. 
+
+La plataforma cruza datos de **Inside Airbnb, Booking, Eustat, OpenStreetMap e Idealista** para destapar el fraude administrativo, clasificar a grandes tenedores y predecir el impacto inflacionista sobre el alquiler residencial en Bilbao, Donostia-San Sebastián y Vitoria-Gasteiz.
 
 ---
 
-## 🎯 1. Objetivo del Proyecto
+## 🏗️ Arquitectura Técnica y Stack
 
-El avance de las Viviendas de Uso Turístico (VUT) en las capitales de la Comunidad Autónoma Vasca ha generado tensiones en el mercado del alquiler tradicional. **Meatzaritza Data Labs — Especulómetro Vasco** nace como un ecosistema analítico de software libre y machine learning diseñado para fiscalizar de forma automatizada el suelo urbano residencial.
+Este proyecto no es un simple cuaderno de análisis; es una solución de software escalable dividida en servicios independientes:
 
-El objetivo central es auditar anuncios activos, cruzar plataformas opacas, identificar dinámicas de fraude administrativo y proyectar el impacto económico real (inflación y desplazamiento) sobre el derecho a la vivienda de los residentes locales en Bilbao, Donostia-San Sebastián y Vitoria-Gasteiz.
-
----
-
-## 📊 2. Arquitectura de Fuentes y Cruce de Datos
-
-Para evitar los sesgos de los conjuntos de datos genéricos, este proyecto implementa un modelo de enriquecimiento geoespacial multiplataforma cruzando cuatro grandes capas de información:
-
-1. **Censo Turístico Base (Inside Airbnb):** Extracción de la matriz base del censo de perfiles de anfitriones, tarifas basales, identificadores únicos y el campo crítico de licencias oficiales (`listings.csv.gz`).
-2. **Multiplataforma (Booking.com):** Inyección de vectores de control de fricción y rotación habitacional. Permite evaluar la duplicación de anuncios y la explotación comercial intensiva.
-3. **Músculo Financiero (Eustat):** Vinculación de micro-datos socioeconómicos del País Vasco por sección censal (Renta Media por Hogar y tasa de variación demográfica/pérdida de población local a 5 años).
-4. **Infraestructura Urbana (OpenStreetMap):** Extracción geoespacial de variables de entorno mediante un radio de influencia de 500 metros (densidad de locales de ocio nocturno, saturación de franquicias turísticas y distancias métricas a hitos costeros o monumentos).
-5. **Presión del Suelo (Idealista + Catastro Foral):** Captura del precio basal del metro cuadrado residencial tradicional para computar las tasas de desviación y la rentabilidad del suelo.
+* **Frontend (UI/UX Reactiva):** Desarrollado en **Next.js 15 (React 19)** y **Tailwind CSS**. Implementa una interfaz interactiva estilo *Glassmorphism* (Antigravity UI) que renderiza gráficos SVG matemáticos y estados de carga optimizados.
+* **Backend (Inferencia AI en tiempo real):** Servidor **FastAPI** asíncrono (ASGI) que carga los binarios entrenados en memoria en su ciclo de vida (`lifespan`) para una latencia de predicción casi nula.
+* **Machine Learning Core:** Arquitectura de **Stacking Ensemble** implementando modelos de Árboles de Decisión (`RandomForestClassifier`, `RandomForestRegressor`) y Gradient Boosting (`XGBoost`).
 
 ---
 
-## ⚙️ 3. Metodología e Ingeniería de Características (Feature Engineering)
+## 🧠 El Motor Predictivo: Suite Tri-Modular en Cascada
 
-El pipeline de datos sigue un flujo lineal e independiente dividido en fases estrictas para garantizar la reproducibilidad científica:
+Para abordar un problema complejo y multivariable como la gentrificación, el sistema huye de los modelos predictivos planos y utiliza una arquitectura de inferencia en cascada mediante *Meta-Features*:
 
-### A. Parser Forense de Strings (Regex)
-Muchos grandes tenedores camuflan la explotación masiva incrustando los 18 dígitos del código catastral del edificio dentro del campo de la licencia turística individual de la plataforma para esquivar las inspecciones. Se implementa un parser basado en expresiones regulares (`Regex`) que audita las cadenas de texto, extrae la licencia real oculta y etiqueta de forma binaria el **Fraude de Formato Administrativo** (`y_fraude_administrativo`).
-
-### B. Construcción de Índices de Daño Social
-A partir de las variables exógenas unificadas, se computan tres métricas nucleares de negocio:
-* **Ratio de Especulación Real:** Determina cuántas veces supera el rendimiento mensual estimado de la explotación turística frente al precio de mercado del alquiler residencial tradicional en el mismo barrio.
-  $$\text{Ratio Especulación} = \frac{\text{Precio por Noche} \times 22}{\text{Metros Cuadrados Catastro} \times \text{Precio } m^2 \text{ Idealista}}$$
-  Un ratio $> 2.5$ establece de forma matemática el *Ground Truth* de explotación comercial desmedida.
-* **Índice de Desertización Comercial:** Ponderación basada en la desaparición del comercio de proximidad local por la proliferación de servicios orientados en exclusiva al visitante.
-* **Índice de Desplazamiento Vecinal:** Porcentaje de saturación del inmueble que mide el bloqueo físico del suelo a los habitantes fijos de la localidad.
+1. **Módulo 1: El Especulómetro (Clasificador RF):** Analiza el vector de entrada y clasifica si el anuncio pertenece a un particular o a un Gran Tenedor / Fondo Comercial.
+2. **Módulo 2: El Cazapiratas (Clasificador XGBoost):** Evalúa el riesgo conductual y administrativo, detectando fraudes como el camuflaje del número de Catastro en los campos de Licencia Turística.
+3. **Módulo 3: El Oráculo Urbano (Regresor RF):** El modelo maestro. Recibe el vector original y se le inyectan dinámicamente las probabilidades continuas de los Módulos 1 y 2 (*meta-features*). Esto le permite predecir con extrema precisión el impacto inflacionista exacto (+€/m²) en los contratos de alquiler de los residentes del barrio.
 
 ---
 
-## 🤖 4. Modelado Predictivo: La Suite Tri-Modular en Cascada
+## ⚡ Resiliencia y Diseño de Producción
 
-En lugar de delegar la predicción en un único modelo plano, el core de inteligencia artificial se compone de una **arquitectura multimodelo en cascada** basada en algoritmos de ensamble (Árboles de Decisión):
+* **Generación de Reportes Forenses:** Capacidad para exportar en el cliente archivos `.JSON` con el dictamen de la IA y el cruce de datos del Eustat para auditorías oficiales.
+* **Sistema de Contingencia Determinista (Anti-Demo Fail):** El endpoint `/api/analyze-url` incluye un scraper (Playwright Stealth). Si los portales bloquean la petición durante una demostración en vivo, el backend implementa un *fallback* con semilla determinista basada en el ID del anuncio extraído vía Regex, garantizando que el sistema siempre devuelva resultados analíticos coherentes sin romper el flujo de la aplicación.
+* **Prevención de Data Leakage:** Pipeline de entrenamiento diseñado con separación estricta y eliminación de variables altamente correlacionadas con el target (Ratio de Especulación) en la matriz de test.
+
+---
+
+## 🚀 Despliegue en Entorno Local
+
+Para levantar el ecosistema completo en tu máquina local:
+
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/tu-usuario/especulometro.git](https://github.com/tu-usuario/especulometro.git)
+cd especulometro
