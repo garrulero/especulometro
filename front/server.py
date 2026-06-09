@@ -51,7 +51,7 @@ async def lifespan(app: FastAPI):
     yield
     ml_models.clear()
 
-app = FastAPI(title="Especulómetro Vasco — Meatzaritza Urban Suite API", lifespan=lifespan)
+app = FastAPI(title="Especulómetro Vasco API", lifespan=lifespan)
 
 # Configurar CORS
 app.add_middleware(

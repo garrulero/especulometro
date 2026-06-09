@@ -116,7 +116,7 @@ export default function Home() {
   const downloadForenseReport = () => {
     const reportData = {
       timestamp: new Date().toISOString(),
-      fuente: "Meatzaritza Labs - Especulómetro Vasco v1.5",
+      fuente: "Especulómetro Vasco v1.5",
       analisis_tipo: activeTab === "url" ? "URL Guerrilla" : "Simulación Manual",
       alojamiento: activeTab === "url" ? {
         titulo: analyzedListing?.title,
@@ -158,6 +158,18 @@ export default function Home() {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (data.ratio_especulacion / 100) * circumference;
 
+  const m1Ratio = data.ratio_especulacion;
+  const isM1Red = m1Ratio > 66;
+  const isM1Yellow = m1Ratio > 33 && m1Ratio <= 66;
+  const isM1Green = m1Ratio <= 33;
+  
+  const m1StrokeClass = isM1Red ? 'stroke-red-500' : isM1Yellow ? 'stroke-yellow-400' : 'stroke-emerald-400';
+  const m1GlowClass = isM1Red ? 'neon-glow-red text-red-500' : isM1Yellow ? 'drop-shadow-[0_0_8px_rgba(250,204,21,0.8)] text-yellow-400' : 'neon-glow-emerald text-emerald-400';
+  const m1BorderClass = isM1Red ? 'border-red-500/30 bg-red-500/5' : isM1Yellow ? 'border-yellow-400/20 bg-yellow-400/5' : 'border-emerald-400/20 bg-emerald-400/5';
+
+  const m2Ratio = data.indice_desplazamiento;
+  const isM2High = m2Ratio > 50;
+
   return (
     <div className="min-h-screen text-gray-100 flex flex-col justify-between">
       
@@ -169,7 +181,7 @@ export default function Home() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-wider text-white flex items-center gap-2">
-              MEATZARITZA <span className="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded font-mono">URBAN SUITE</span>
+              ESPECULÓMETRO
             </h1>
           </div>
         </div>
@@ -182,7 +194,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 md:p-8 gap-8">
         
         {/* MÓDULO IZQUIERDO: Panel de Control (Sidebar) */}
-        <aside className="glass-panel rounded-2xl p-6 w-full lg:w-80 flex-shrink-0 flex flex-col gap-6 self-start">
+        <aside className="rounded-2xl p-6 w-full lg:w-80 flex-shrink-0 flex flex-col gap-6 self-start lg:sticky lg:top-24 bg-[#12151A]/90 border border-white/10 shadow-2xl shadow-black/80 backdrop-blur-xl z-40">
           
           <div className="border-b border-white/5 pb-4">
             <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest">Auditoría</h2>
@@ -328,115 +340,147 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Tarjeta 1: El Especulómetro */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col items-center justify-between min-h-[220px] transition-all relative overflow-hidden group ${
-              data.ratio_especulacion > 60 ? 'border-red-fire/30 bg-red-950/5' : ''
-            } ${loading ? 'skeleton-shimmer' : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col items-center justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative overflow-hidden group ${!loading ? m1BorderClass : ''}`}>
               <div className="w-full flex items-center justify-between text-xs font-semibold">
                 <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <AlertTriangle className={`w-4 h-4 ${data.ratio_especulacion > 60 ? 'text-red-fire' : 'text-emerald-neon'}`} /> Especulómetro
+                  <AlertTriangle className={`w-4 h-4 ${!loading ? (isM1Red ? 'text-red-500' : isM1Yellow ? 'text-yellow-400' : 'text-emerald-400') : 'text-gray-500'}`} /> Especulómetro
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono">MÓDULO M1</span>
               </div>
               
-              {/* Donut Chart SVG */}
-              <div className="relative w-28 h-28 flex items-center justify-center my-3">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle 
-                    cx="50" cy="50" r={radius} 
-                    className="stroke-black/30 fill-none" 
-                    strokeWidth="8"
-                  />
-                  <circle 
-                    cx="50" cy="50" r={radius} 
-                    className={`fill-none transition-all duration-700 ease-out ${
-                      data.ratio_especulacion > 60 ? 'stroke-red-fire' : 'stroke-emerald-neon'
-                    }`} 
-                    strokeWidth="8"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={loading ? circumference : strokeDashoffset}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className={`text-2xl font-bold font-mono ${data.ratio_especulacion > 60 ? 'text-red-fire neon-glow-red' : 'text-emerald-neon neon-glow-emerald'}`}>
-                    {loading ? "..." : `${data.ratio_especulacion.toFixed(0)}%`}
-                  </span>
-                  <span className="text-[8px] text-gray-500 uppercase tracking-widest">Multi-Host</span>
+              {loading ? (
+                <div className="flex flex-col items-center justify-center my-3 w-full space-y-4">
+                  <div className="w-24 h-24 rounded-full bg-gray-800 animate-pulse border-[8px] border-gray-700/50"></div>
+                  <div className="w-3/4 h-6 bg-gray-800 animate-pulse rounded"></div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  {/* Donut Chart SVG */}
+                  <div className="relative w-28 h-28 flex items-center justify-center my-3">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                      <circle 
+                        cx="50" cy="50" r={radius} 
+                        className="stroke-black/30 fill-none" 
+                        strokeWidth="8"
+                      />
+                      <circle 
+                        cx="50" cy="50" r={radius} 
+                        className={`fill-none transition-all duration-700 ease-out ${m1StrokeClass}`} 
+                        strokeWidth="8"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center justify-center">
+                      <span className={`text-2xl font-bold font-mono ${m1GlowClass}`}>
+                        {data.ratio_especulacion.toFixed(0)}%
+                      </span>
+                      <span className="text-[8px] text-gray-500 uppercase tracking-widest">Multi-Host</span>
+                    </div>
+                  </div>
 
-              <div className="w-full text-center">
-                {data.ratio_especulacion > 60 ? (
-                  <span className="text-[10px] font-bold text-red-fire bg-red-500/10 px-2.5 py-1 rounded border border-red-500/20 block animate-pulse">
-                    Alerta: Explotación Profesional/Multi-host
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-gray-400 bg-black/30 px-2.5 py-1 rounded block">
-                    Particular / Operación moderada
-                  </span>
-                )}
-              </div>
+                  <div className="w-full text-center">
+                    {isM1Red ? (
+                      <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-2.5 py-1 rounded border border-red-500/20 block animate-pulse">
+                        Alerta: Explotación Profesional/Multi-host
+                      </span>
+                    ) : isM1Yellow ? (
+                      <span className="text-[10px] font-bold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded border border-yellow-400/20 block">
+                        Aviso: Actividad Comercial Moderada
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/20 block">
+                        Particular / Operación moderada
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Tarjeta 2: El Cazapiratas */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] ${loading ? 'skeleton-shimmer' : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50 ${!loading && isM2High ? 'border-red-500/30 bg-red-500/5' : ''}`}>
               <div className="w-full flex items-center justify-between text-xs font-semibold">
                 <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <Building className="w-4 h-4 text-orange-neon" /> El Cazapiratas
+                  <Building className={`w-4 h-4 ${!loading && isM2High ? 'text-red-500' : 'text-orange-400'}`} /> El Cazapiratas
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono">MÓDULO M2</span>
               </div>
 
-              <div className="my-4 space-y-4">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Fraude de Licencia</span>
-                  <span className="text-2xl font-bold font-mono text-white">
-                    {loading ? "..." : `${data.indice_desplazamiento.toFixed(0)}%`}
-                  </span>
+              {loading ? (
+                <div className="my-4 space-y-4 flex flex-col justify-center flex-1">
+                  <div className="flex justify-between items-baseline w-full">
+                    <div className="w-1/2 h-4 bg-gray-800 animate-pulse rounded"></div>
+                    <div className="w-12 h-8 bg-gray-800 animate-pulse rounded"></div>
+                  </div>
+                  <div className="w-full bg-gray-800 h-2.5 rounded-full animate-pulse"></div>
+                  <div className="w-full h-8 bg-gray-800 animate-pulse rounded mt-4"></div>
                 </div>
+              ) : (
+                <>
+                  <div className="my-4 space-y-4">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider">Fraude de Licencia</span>
+                      <span className={`text-2xl font-bold font-mono ${isM2High ? 'text-red-500 neon-glow-red animate-pulse' : 'text-white'}`}>
+                        {data.indice_desplazamiento.toFixed(0)}%
+                      </span>
+                    </div>
 
-                {/* Tachometer linear bar */}
-                <div className="w-full bg-black/40 h-2.5 rounded-full overflow-hidden border border-white/5">
-                  <div 
-                    className="h-full rounded-full transition-all duration-700 ease-out"
-                    style={{ 
-                      width: `${loading ? 0 : data.indice_desplazamiento}%`,
-                      backgroundImage: `linear-gradient(to right, #10b981, #f97316, #ef4444)` 
-                    }}
-                  />
-                </div>
-              </div>
+                    {/* Tachometer linear bar */}
+                    <div className="w-full bg-black/40 h-2.5 rounded-full overflow-hidden border border-white/5">
+                      <div 
+                        className="h-full rounded-full transition-all duration-700 ease-out"
+                        style={{ 
+                          width: `${data.indice_desplazamiento}%`,
+                          backgroundImage: `linear-gradient(to right, #10b981, #f97316, #ef4444)` 
+                        }}
+                      />
+                    </div>
+                  </div>
 
-              <div className="w-full text-xs">
-                <span className="text-gray-400">Riesgo de irregularidad en inspección municipal:</span>
-                <strong className={`ml-1 font-mono uppercase ${
-                  data.indice_desplazamiento > 50 ? 'text-red-fire' : 'text-emerald-neon'
-                }`}>
-                  {data.indice_desplazamiento > 50 ? "Alto" : "Bajo"}
-                </strong>
-              </div>
+                  <div className="w-full text-xs">
+                    <span className="text-gray-400">Riesgo de irregularidad en inspección municipal:</span>
+                    <strong className={`ml-1 font-mono uppercase ${
+                      isM2High ? 'text-red-500 neon-glow-red' : 'text-emerald-400'
+                    }`}>
+                      {isM2High ? "Alto" : "Bajo"}
+                    </strong>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Tarjeta 3: El Oráculo Urbano */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] ${loading ? 'skeleton-shimmer' : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50`}>
               <div className="w-full flex items-center justify-between text-xs font-semibold">
                 <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-cyan-400" /> Oráculo Urbano
+                  <BarChart3 className="w-4 h-4 text-orange-400" /> Oráculo Urbano
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono">MÓDULO M3</span>
               </div>
 
-              <div className="my-3 text-center">
-                <div className="text-4xl font-extrabold text-cyan-400 font-mono neon-glow-cyan">
-                  {loading ? "..." : `+${data.impacto_economico.toFixed(2)}`}
-                  <span className="text-lg text-gray-400 ml-1">€/m²</span>
+              {loading ? (
+                <div className="my-3 flex flex-col items-center justify-center space-y-4 flex-1">
+                  <div className="w-24 h-10 bg-gray-800 animate-pulse rounded"></div>
+                  <div className="w-32 h-4 bg-gray-800 animate-pulse rounded"></div>
+                  <div className="w-full h-10 bg-gray-800 animate-pulse rounded mt-2"></div>
                 </div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Presión Inflacionaria</p>
-              </div>
+              ) : (
+                <>
+                  <div className="my-3 text-center">
+                    <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 font-mono drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]">
+                      +{data.impacto_economico.toFixed(2)}
+                      <span className="text-lg text-gray-400 ml-1 drop-shadow-none">€/m²</span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Presión Inflacionaria</p>
+                  </div>
 
-              <div className="text-[10px] leading-relaxed text-gray-400 border-t border-white/5 pt-3">
-                Este activo presiona al alza el alquiler de los vecinos de este barrio en un estimado de <strong className="text-white font-mono">{(data.impacto_economico * 80).toFixed(0)}€</strong> al mes por cada vivienda de 80m².
-              </div>
+                  <div className="text-[10px] leading-relaxed text-gray-400 border-t border-white/5 pt-3">
+                    Este activo presiona al alza el alquiler de los vecinos de este barrio en un estimado de <strong className="text-orange-400 font-mono">+{(data.impacto_economico * 80).toFixed(0)}€</strong> al mes por cada vivienda de 80m².
+                  </div>
+                </>
+              )}
             </div>
 
           </div>
@@ -445,34 +489,51 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Sección A: Criterio de Especulación */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between ${loading ? 'skeleton-shimmer' : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between shadow-lg shadow-black/50`}>
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-white/5 pb-3">
-                  <Coins className="w-4 h-4 text-orange-neon" /> Ratio de Explotación Comercial
+                  <Coins className="w-4 h-4 text-orange-400" /> Ratio de Explotación Comercial
                 </h3>
                 
-                <div className="my-5 flex items-center gap-4 justify-around">
-                  <div className="text-center">
-                    <span className="text-[9px] text-gray-500 uppercase block font-mono">VUT Mensual</span>
-                    <span className="text-xl font-bold font-mono text-orange-neon">
-                      {loading ? "..." : `${data.detalles.ingreso_mensual_vut_estimado.toLocaleString('es-ES', {maximumFractionDigits: 0})} €`}
-                    </span>
+                {loading ? (
+                  <div className="my-5 flex flex-col space-y-4">
+                     <div className="w-full h-8 bg-gray-800 animate-pulse rounded"></div>
+                     <div className="w-full h-8 bg-gray-800 animate-pulse rounded"></div>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-gray-600 bg-white/5 border border-white/10 px-2 py-0.5 rounded font-mono">vs</span>
-                    <ArrowRight className="w-4 h-4 text-gray-600 mt-1" />
+                ) : (
+                  <div className="my-5 flex flex-col gap-4">
+                    {/* Gráfico de Barras Superpuestas / Apiladas */}
+                    <div className="relative pt-2">
+                      {/* Residencial Bar */}
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">Alquiler Residencial</span>
+                        <span className="text-xs font-bold text-gray-300 font-mono">{data.detalles.alquiler_residencial_estimado.toLocaleString('es-ES', {maximumFractionDigits: 0})} €</span>
+                      </div>
+                      <div className="w-full bg-black/40 h-4 rounded-r-lg overflow-hidden flex">
+                        <div 
+                          className="bg-gray-600 h-full rounded-r-lg" 
+                          style={{ width: `${Math.min(100, (data.detalles.alquiler_residencial_estimado / Math.max(data.detalles.alquiler_residencial_estimado, data.detalles.ingreso_mensual_vut_estimado)) * 100)}%` }}
+                        ></div>
+                      </div>
+                      
+                      {/* VUT Bar */}
+                      <div className="flex items-center justify-between mt-3 mb-1">
+                        <span className="text-[10px] text-orange-400 uppercase tracking-widest font-mono">Ingreso VUT Estimado</span>
+                        <span className="text-xs font-bold text-orange-400 font-mono">{data.detalles.ingreso_mensual_vut_estimado.toLocaleString('es-ES', {maximumFractionDigits: 0})} €</span>
+                      </div>
+                      <div className="w-full bg-black/40 h-4 rounded-r-lg overflow-hidden flex">
+                        <div 
+                          className="bg-gradient-to-r from-orange-600 to-orange-400 h-full rounded-r-lg" 
+                          style={{ width: `${Math.min(100, (data.detalles.ingreso_mensual_vut_estimado / Math.max(data.detalles.alquiler_residencial_estimado, data.detalles.ingreso_mensual_vut_estimado)) * 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <span className="text-[9px] text-gray-500 uppercase block font-mono">Residencial Medio</span>
-                    <span className="text-xl font-bold font-mono text-gray-400">
-                      {loading ? "..." : `${data.detalles.alquiler_residencial_estimado.toLocaleString('es-ES', {maximumFractionDigits: 0})} €`}
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
 
               <p className="text-xs text-gray-400 leading-relaxed bg-black/20 p-3.5 rounded-lg border border-white/5">
-                Este inmueble genera <strong className="text-orange-neon font-mono">{loading ? "..." : `${data.ratio_explotacion_comercial} veces`}</strong> más ingresos operando como Vivienda de Uso Turístico (VUT) que si se alquilara a una familia de la localidad a través del precio medio de Idealista en este municipio.
+                Este inmueble genera <strong className="text-orange-400 font-mono">{loading ? "..." : `${data.ratio_explotacion_comercial} veces`}</strong> más ingresos operando como Vivienda de Uso Turístico (VUT) que si se alquilara a una familia de la localidad.
               </p>
             </div>
 
@@ -521,7 +582,7 @@ export default function Home() {
 
       {/* Pie de página */}
       <footer className="border-t border-white/5 py-4 px-6 text-center text-xs text-gray-600 bg-black/30 font-mono">
-        © 2026 Meatzaritza Labs — Suite Predictiva de Especulometría. Licencia de Software Libre.
+        © 2026 Especulómetro — Suite Predictiva de Especulometría. Licencia de Software Libre.
       </footer>
 
     </div>
