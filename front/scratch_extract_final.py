@@ -175,6 +175,9 @@ async def extract_airbnb_data(url):
                 }
             }
             
+            // 4. Extraer texto visible de la pagina para el NLP Model
+            data.page_text = document.body.innerText || '';
+            
             return data;
         }''')
         
@@ -314,6 +317,8 @@ async def extract_booking_data(url):
                     break;
                 }
             }
+            
+            data.page_text = document.body.innerText || '';
             
             return data;
         }''')

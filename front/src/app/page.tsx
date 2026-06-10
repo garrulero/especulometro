@@ -11,6 +11,8 @@ export default function Home() {
   const [municipio, setMunicipio] = useState("Bilbao");
   const [precio, setPrecio] = useState(120);
   const [disponibilidad, setDisponibilidad] = useState(280);
+  const [description, setDescription] = useState("");
+  const [hostAbout, setHostAbout] = useState("");
 
   // Inputs de URL
   const [urlInput, setUrlInput] = useState("");
@@ -70,7 +72,9 @@ export default function Home() {
             body: JSON.stringify({
               municipio,
               precio_por_noche: precio,
-              disponibilidad
+              disponibilidad,
+              description,
+              host_about: hostAbout
             })
           });
           if (response.ok) {
@@ -89,7 +93,7 @@ export default function Home() {
 
       return () => clearTimeout(delayDebounce);
     }
-  }, [municipio, precio, disponibilidad, activeTab]);
+  }, [municipio, precio, disponibilidad, description, hostAbout, activeTab]);
 
   // Manejador para auditar URL de Airbnb/Booking
   const handleUrlAudit = async (e: React.FormEvent) => {
@@ -129,6 +133,8 @@ export default function Home() {
     setPrecio(120);
     setDisponibilidad(280);
     setMunicipio("Bilbao");
+    setDescription("");
+    setHostAbout("");
   };
 
   // Descarga del diagnóstico forense en JSON
@@ -324,6 +330,30 @@ export default function Home() {
                 <span>365 días (Cartel)</span>
               </div>
             </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-400 flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-cyan-400" /> Descripción del Anuncio (NLP)
+              </label>
+              <textarea 
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ej: Luxury flat managed by agency..."
+                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-colors h-20 resize-none placeholder:text-gray-600"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-400 flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-cyan-400" /> Perfil del Anfitrión (NLP)
+              </label>
+              <textarea 
+                value={hostAbout}
+                onChange={(e) => setHostAbout(e.target.value)}
+                placeholder="Ej: We are an elite property team..."
+                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-colors h-16 resize-none placeholder:text-gray-600"
+              />
+            </div>
           </div>
 
           {activeTab === "url" && (
@@ -375,7 +405,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Tarjeta 1: El Especulómetro */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col items-center justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative overflow-hidden group ${!loading ? m1BorderClass : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col items-center justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative group ${!loading ? m1BorderClass : ''}`}>
               <div className="w-full flex items-center justify-between text-xs font-semibold relative z-10">
                 <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
                   <AlertTriangle className={`w-4 h-4 ${!loading ? (isM1Red ? 'text-red-500' : isM1Yellow ? 'text-yellow-400' : 'text-emerald-400') : 'text-gray-500'}`} /> Especulómetro
@@ -441,7 +471,7 @@ export default function Home() {
             </div>
 
             {/* Tarjeta 2: El Cazapiratas */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative overflow-hidden group ${!loading ? m2BorderClass : ''}`}>
+            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative group ${!loading ? m2BorderClass : ''}`}>
               <div className="w-full flex items-center justify-between text-xs font-semibold relative z-10">
                 <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
                   <Building className={`w-4 h-4 ${!loading ? m2TextClass : 'text-gray-500'}`} /> El Cazapiratas
