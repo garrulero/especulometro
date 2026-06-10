@@ -1,4 +1,4 @@
-# 🔬 Especulómetro Vasco | Meatzaritza Urban Suite
+# 🔬 Especulómetro Vasco 
 > **End-to-End Machine Learning MVP para auditar el impacto sociodemográfico de las Viviendas de Uso Turístico (VUT) en Euskadi.**
 
 ![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
