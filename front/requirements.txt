@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+sentence-transformers
+playwright
+playwright-stealth
+beautifulsoup4

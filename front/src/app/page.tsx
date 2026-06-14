@@ -158,8 +158,6 @@ export default function Home() {
       },
       indicadores_ia: {
         especulometro_m1_prob_gran_tenedor: `${data.ratio_especulacion}%`,
-        cazapiratas_m2_prob_irregularidad: `${data.indice_desplazamiento}%`,
-        oraculo_urbano_m3_presion_alquiler: `+${data.impacto_economico} €/m²`,
         alerta_tenencia_profesional: data.ratio_especulacion > 60 ? "CRÍTICA" : "NORMAL"
       },
       impacto_social: {
@@ -191,20 +189,6 @@ export default function Home() {
   const m1StrokeClass = isM1Red ? 'stroke-red-500' : isM1Yellow ? 'stroke-yellow-400' : 'stroke-emerald-400';
   const m1GlowClass = isM1Red ? 'neon-glow-red text-red-500' : isM1Yellow ? 'drop-shadow-[0_0_8px_rgba(250,204,21,0.8)] text-yellow-400' : 'neon-glow-emerald text-emerald-400';
   const m1BorderClass = isM1Red ? 'border-red-500/30 bg-red-500/5' : isM1Yellow ? 'border-yellow-400/20 bg-yellow-400/5' : 'border-emerald-400/20 bg-emerald-400/5';
-
-  const m2Ratio = data.indice_desplazamiento;
-  const isM2High = m2Ratio > 60;
-  const isM2Low = m2Ratio < 40;
-  
-  const m2BorderClass = isM2High 
-    ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)] bg-red-500/5' 
-    : isM2Low 
-      ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/5' 
-      : 'border-orange-500/50 bg-orange-500/5 text-orange-400';
-  
-  const m2StrokeClass = isM2High ? 'stroke-red-500' : isM2Low ? 'stroke-emerald-500' : 'stroke-orange-500';
-  const m2TextClass = isM2High ? 'text-red-500' : isM2Low ? 'text-emerald-400' : 'text-orange-400';
-  const m2StrokeDashoffset = circumference - (m2Ratio / 100) * circumference;
 
   return (
     <div className="min-h-screen text-gray-100 flex flex-col justify-between">
@@ -401,8 +385,8 @@ export default function Home() {
             </div>
           )}
 
-          {/* MÓDULO CENTRAL SUPERIOR: El Panel Tri-Modular (Métricas de la IA) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* MÓDULO CENTRAL SUPERIOR: El Panel Unimodular (Métricas de la IA) */}
+          <div className="grid grid-cols-1 max-w-md mx-auto w-full gap-6">
             
             {/* Tarjeta 1: El Especulómetro */}
             <div className={`glass-panel rounded-2xl p-6 flex flex-col items-center justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative group ${!loading ? m1BorderClass : ''}`}>
@@ -465,101 +449,6 @@ export default function Home() {
                         Particular / Operación moderada
                       </span>
                     )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Tarjeta 2: El Cazapiratas */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50 transition-all relative group ${!loading ? m2BorderClass : ''}`}>
-              <div className="w-full flex items-center justify-between text-xs font-semibold relative z-10">
-                <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <Building className={`w-4 h-4 ${!loading ? m2TextClass : 'text-gray-500'}`} /> El Cazapiratas
-                  <div className="relative group/tooltip">
-                    <Info className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-black/95 border border-white/10 text-[10px] text-gray-300 rounded shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 normal-case tracking-normal">
-                      Calcula la probabilidad de que la licencia turística no exista o sea fraudulenta en base a cruce de datos.
-                    </div>
-                  </div>
-                </span>
-                <span className="text-[10px] text-gray-500 font-mono">MÓDULO M2</span>
-              </div>
-
-              {loading ? (
-                <div className="flex flex-col items-center justify-center my-3 w-full space-y-4">
-                  <div className="w-24 h-24 rounded-full bg-gray-800 animate-pulse border-[8px] border-gray-700/50"></div>
-                  <div className="w-3/4 h-6 bg-gray-800 animate-pulse rounded"></div>
-                </div>
-              ) : (
-                <>
-                  {/* Donut Chart SVG M2 */}
-                  <div className="relative w-28 h-28 flex items-center justify-center my-3 mx-auto">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      <circle 
-                        cx="50" cy="50" r={radius} 
-                        className="stroke-black/30 fill-none" 
-                        strokeWidth="8"
-                      />
-                      <circle 
-                        cx="50" cy="50" r={radius} 
-                        className={`fill-none transition-all duration-1000 ease-out ${m2StrokeClass}`} 
-                        strokeWidth="8"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={m2StrokeDashoffset}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="absolute flex flex-col items-center justify-center">
-                      <span className={`text-2xl font-bold font-mono ${m2TextClass} ${isM2High ? 'neon-glow-red animate-pulse' : ''}`}>
-                        {data.indice_desplazamiento.toFixed(0)}%
-                      </span>
-                      <span className="text-[8px] text-gray-500 uppercase tracking-widest">Fraude</span>
-                    </div>
-                  </div>
-
-                  <div className="w-full text-center">
-                    <span className="text-[10px] text-gray-400">Riesgo de irregularidad:</span>
-                    <strong className={`ml-1 font-mono uppercase text-[10px] ${m2TextClass}`}>
-                      {isM2High ? "Alto" : isM2Low ? "Bajo" : "Medio"}
-                    </strong>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Tarjeta 3: El Oráculo Urbano */}
-            <div className={`glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[220px] shadow-lg shadow-black/50`}>
-              <div className="w-full flex items-center justify-between text-xs font-semibold relative z-10">
-                <span className="text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-orange-400" /> Oráculo Urbano
-                  <div className="relative group/tooltip">
-                    <Info className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-black/95 border border-white/10 text-[10px] text-gray-300 rounded shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 normal-case tracking-normal">
-                      Calculado mediante un Random Forest Regressor que pondera la probabilidad de especulación y la presión turística del barrio.
-                    </div>
-                  </div>
-                </span>
-                <span className="text-[10px] text-gray-500 font-mono">MÓDULO M3</span>
-              </div>
-
-              {loading ? (
-                <div className="my-3 flex flex-col items-center justify-center space-y-4 flex-1">
-                  <div className="w-24 h-10 bg-gray-800 animate-pulse rounded"></div>
-                  <div className="w-32 h-4 bg-gray-800 animate-pulse rounded"></div>
-                  <div className="w-full h-10 bg-gray-800 animate-pulse rounded mt-2"></div>
-                </div>
-              ) : (
-                <>
-                  <div className="my-3 text-center">
-                    <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 font-mono drop-shadow-[0_0_10px_rgba(251,146,60,0.6)]">
-                      +{data.impacto_economico.toFixed(2)}
-                      <span className="text-lg text-gray-400 ml-1 drop-shadow-none">€/m²</span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Presión Inflacionaria</p>
-                  </div>
-
-                  <div className="text-[10px] leading-relaxed text-gray-400 border-t border-white/5 pt-3">
-                    Este activo presiona al alza el alquiler de los vecinos de este barrio en un estimado de <strong className="text-orange-400 font-mono">+{(data.impacto_economico * 80).toFixed(0)}€</strong> al mes por cada vivienda de 80m².
                   </div>
                 </>
               )}

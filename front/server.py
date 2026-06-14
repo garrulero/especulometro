@@ -29,7 +29,8 @@ app.add_middleware(
 # ==============================================================================
 # 🧠 1. CARGA GLOBAL DE LOS MODELOS DE INTELIGENCIA ARTIFICIAL
 # ==============================================================================
-PATH_RAIZ = r"C:\Users\bootr\Documents\proyectos\PROYECTO ML\especulometro"
+# Obtener la ruta raiz del proyecto de forma dinamica (padre del directorio 'front' donde esta este server.py)
+PATH_RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PATH_MODELO_NLP = os.path.join(PATH_RAIZ, "models", "trained_model_1_nlp.pkl")
 
 print("Cargando el motor Transformer Multilingue en memoria...")
