@@ -23,11 +23,13 @@ Este proyecto no es un simple cuaderno de análisis; es una solución de softwar
 
 ---
 
-## 🧠 El Motor Predictivo: El Especulómetro
+## 🧠 El Motor Predictivo: El Especulómetro y Procesamiento NLP
 
-Para abordar un problema complejo y multivariable como la gentrificación, el sistema se apoya en un potente modelo de Machine Learning especializado:
+Para abordar un problema complejo y multivariable como la gentrificación, el sistema se apoya en una arquitectura de Machine Learning que combina modelos predictivos con Procesamiento de Lenguaje Natural avanzado:
 
-* **Clasificador Random Forest (El Especulómetro):** Analiza el vector de entrada (características del alojamiento, tarifas, disponibilidad, y procesamiento NLP de las descripciones) y determina la probabilidad de que el anuncio pertenezca a un particular o a un Gran Tenedor / Fondo Comercial. Esto permite detectar de forma automática operaciones profesionalizadas (multi-host) que actúan bajo el radar, revelando su impacto real en el mercado inmobiliario local.
+* **Procesamiento Semántico (Transformer Multilingüe):** El texto extraído de las descripciones de los anuncios y perfiles de los anfitriones es procesado utilizando el modelo `paraphrase-multilingual-MiniLM-L12-v2` mediante `SentenceTransformers`. Este modelo captura los matices semánticos del lenguaje (detectando comportamientos corporativos o estandarizados) y los convierte en un vector numérico denso.
+* **Clasificador Principal (El Especulómetro):** El modelo predictivo recibe este vector semántico junto con el resto de características (tarifas, disponibilidad, municipio) y determina la probabilidad de que la vivienda pertenezca a un particular o a un Gran Tenedor / Fondo Comercial. Esto detecta de forma automática operaciones profesionalizadas (multi-host) que actúan bajo el radar.
+* **Diagnóstico Ejecutivo Forense (LLM Qwen):** Una vez calculadas las métricas, el backend inyecta los resultados numéricos en un *prompt* dinámico hacia un LLM local (`Qwen/Qwen2.5-0.5B-Instruct`). Este modelo redacta un informe diagnóstico breve y argumentado, explicando de forma natural el nivel de especulación, la rentabilidad frente a un alquiler residencial, y el impacto demográfico generado.
 
 ---
 
