@@ -39,6 +39,14 @@ encoder_transformer = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2
 print("Cargando el clasificador semantico lineal (.pkl)...")
 modelo_m1_nlp = joblib.load(PATH_MODELO_NLP)
 
+print("Cargando el generador LLM Qwen2.5-0.5B en memoria (puede tardar un poco)...")
+from transformers import pipeline
+try:
+    llm_generator = pipeline("text-generation", model="Qwen/Qwen2.5-0.5B-Instruct", device="cpu")
+except Exception as e:
+    print(f"Error al cargar Qwen: {e}. Se usará un fallback.")
+    llm_generator = None
+
 
 # ==============================================================================
 # 📋 2. DEFINICIÓN DE SCHEMAS
@@ -65,6 +73,27 @@ def procesar_texto_y_predecir(description: str, host_about: str):
     prob_especulacion = float(modelo_m1_nlp.predict_proba(vector_semantico)[0][1])
     return prob_especulacion
 
+def generar_informe_llm(ratio_especulacion: float, ratio_explotacion: float, municipio: str, alquiler_residencial: float, poblacion_joven: float, desertizacion: float):
+    if not llm_generator:
+        return "El modelo generador (Qwen) no está disponible en este momento."
+    
+    prompt = f"<|im_start|>system\nEres un analista experto en sociología urbana y mercado inmobiliario del País Vasco. Redacta un diagnóstico muy breve y formal.<|im_end|>\n<|im_start|>user\nGenera un diagnóstico forense de máximo 2 frases para un alojamiento en {municipio}. Indica de forma contundente si se trata de un caso de especulación teniendo en cuenta que su probabilidad de pertenecer a un gran tenedor/especulador es del {ratio_especulacion:.1f}%. Argumenta la conclusión mencionando que es {ratio_explotacion:.1f} veces más rentable que un alquiler residencial (renta media {alquiler_residencial:.0f}€) y cómo esto fomenta la pérdida del {poblacion_joven:.1f}% de población joven (Eustat) y una desertización del {desertizacion:.1f}%. No saludes.<|im_end|>\n<|im_start|>assistant\n"
+    try:
+        resultado = llm_generator(prompt, max_new_tokens=150, do_sample=True, temperature=0.3)
+        texto_generado = resultado[0]['generated_text']
+        informe = texto_generado.split("<|im_start|>assistant\n")[-1].replace("<|im_end|>", "").strip()
+        
+        # Evitar cortes a medias si llega al límite de tokens
+        if not informe.endswith('.'):
+            ultimo_punto = informe.rfind('.')
+            if ultimo_punto != -1:
+                informe = informe[:ultimo_punto+1]
+                
+        return informe
+    except Exception as e:
+        logger.error(f"Error en LLM: {str(e)}")
+        return "No se pudo generar el informe narrativo en este momento."
+
 def generar_respuesta(prob_especulacion: float, precio: float, disponibilidad: int, municipio: str):
     # Generar la estructura de respuesta que espera el frontend
     ratio_especulacion = prob_especulacion * 100
@@ -78,6 +107,8 @@ def generar_respuesta(prob_especulacion: float, precio: float, disponibilidad: i
     
     ratio_explotacion = ingreso_vut_mensual / alquiler_residencial if alquiler_residencial > 0 else 1
     
+    informe_generado = generar_informe_llm(ratio_especulacion, ratio_explotacion, municipio, alquiler_residencial, 4.5, 14.2)
+    
     return {
         "ratio_especulacion": ratio_especulacion,
         "indice_desplazamiento": indice_desplazamiento,
@@ -87,6 +118,7 @@ def generar_respuesta(prob_especulacion: float, precio: float, disponibilidad: i
         "ratio_explotacion_comercial": round(ratio_explotacion, 1),
         "eustat_poblacion_joven": 4.5,
         "eustat_desertizacion_comercio": 14.2,
+        "informe_llm": informe_generado,
         "detalles": {
             "renta_media_m2": 15.5,
             "alquiler_residencial_estimado": alquiler_residencial,
@@ -153,6 +185,7 @@ async def analyze_url(payload: UrlInput):
             "host_listings_count": scraped_data.get("host_listings_count", 1),
             "price": scraped_data.get("price", 100),
             "availability": scraped_data.get("availability", 280),
+            "description_scraped": texto_para_ia,
             "analysis": analisis
         }
     except Exception as err:

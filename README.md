@@ -47,5 +47,52 @@ Para levantar el ecosistema completo en tu máquina local:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/tu-usuario/especulometro.git](https://github.com/tu-usuario/especulometro.git)
+git clone https://github.com/tu-usuario/especulometro.git
 cd especulometro
+```
+
+### 2. Requisitos Previos
+* **Node.js** (v18+)
+* **Python** (3.12+)
+
+### 3. Ejecución Rápida (Recomendado en Windows)
+Simplemente ejecuta el script `run.bat` incluido en la raíz del proyecto. Este archivo automatiza la instalación de dependencias y levanta tanto el backend como el frontend en paralelo:
+```cmd
+.\run.bat
+```
+Una vez ejecutado, los servicios estarán disponibles en:
+- **Frontend Web App**: http://localhost:3000
+- **Backend API (FastAPI)**: http://localhost:8000
+
+### 4. Ejecución Manual
+Si prefieres levantar los servicios manualmente:
+
+**Backend (FastAPI e IA):**
+```bash
+cd front
+pip install -r requirements.txt
+python server.py
+```
+
+**Frontend (Next.js):**
+```bash
+cd front
+npm install
+npm run dev
+```
+
+---
+
+## 📓 Notebooks de Modelado (Jupyter)
+En la raíz del proyecto encontrarás la secuencia de experimentación que dio origen al sistema predictivo:
+- `01_Fuentes.ipynb`: Ingesta de datos desde portales y bases de datos del Eustat.
+- `02_LimpiezaEDA.ipynb`: Análisis Exploratorio (EDA) y curación del dataset.
+- `03_Entrenamiento_Evaluacion.ipynb`: Configuración base y validación de features.
+- `04_Modelo_Especulometro.ipynb`: Entrenamiento del Módulo 1 (Clasificador RF).
+- `05_Modelo_Cazapiratas.ipynb`: Entrenamiento del Módulo 2 (XGBoost).
+- `06_Modelo_OraculoUrbano.ipynb`: Entrenamiento del Módulo 3 (Oráculo).
+
+---
+
+## 📖 Manual de Usuario
+Para aprender a utilizar todas las funcionalidades de la aplicación (auditoría de URLs, control manual, simulación y comprensión de los módulos IA), consulta el documento **[GUIA.md](./GUIA.md)**.

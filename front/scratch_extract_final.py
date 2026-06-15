@@ -139,9 +139,10 @@ async def extract_airbnb_data(url):
                     }
                 }
                 
-                // Buscar listings count
-                if (text.includes('anuncio') || text.includes('alojamiento') || text.includes('propiedad') || text.includes('listing')) {
-                    const match = text.match(/(\\d+)\\s*(?:anuncio|alojamiento|propiedad|listing)/i);
+                // Buscar listings count (exigimos que el elemento sea casi exactamente "X anuncios" para no pillar pies de pagina)
+                if (text.toLowerCase().includes('anuncio') || text.toLowerCase().includes('listing')) {
+                    const cleanText = text.trim();
+                    const match = cleanText.match(/^(\\d+)\\s*(?:anuncios|anuncio|listings|listing)$/i);
                     if (match) {
                         data.listingsCountStr = match[0];
                         data.listingsCountVal = parseInt(match[1]);
@@ -175,13 +176,18 @@ async def extract_airbnb_data(url):
                 }
             }
             
-            // 4. Extraer texto visible de la pagina para el NLP Model
+            // 5. Extraer URL del perfil del anfitrión
+            const profileLinks = Array.from(document.querySelectorAll('a')).filter(a => a.href && (a.href.includes('/users/show') || a.href.includes('/users/profile')));
+            if (profileLinks.length > 0) {
+                const hostLink = profileLinks.find(a => a.href.includes('PdpHomeMarketplace')) || profileLinks[profileLinks.length - 1];
+                data.hostProfileUrl = hostLink.href;
+            }
+            
+            // 6. Extraer texto visible de la pagina para el NLP Model
             data.page_text = document.body.innerText || '';
             
             return data;
         }''')
-        
-        await browser.close()
         
         # Procesar datos
         municipio = dom_data.get("municipio")
@@ -208,8 +214,8 @@ async def extract_airbnb_data(url):
             host_listings_count = None
             
         if host_listings_count is None:
-            # Intentar buscar en todo el HTML con el regex probado
-            regex_listings = re.findall(r'(\d+)\s*(?:anuncio|alojamiento|anuncios|alojamientos|listings)', html, re.IGNORECASE)
+            # Intentar buscar en todo el HTML de forma estricta (entre etiquetas para evitar '13 alojamientos similares')
+            regex_listings = re.findall(r'>\s*(\d+)\s*(?:anuncio|anuncios|listings|listing)\s*<', html, re.IGNORECASE)
             for num_str in regex_listings:
                 val = int(num_str)
                 if not (2020 <= val <= 2030):
@@ -217,11 +223,46 @@ async def extract_airbnb_data(url):
                     break
             
             if host_listings_count is None:
-                host_listings_count = 1
-                
-        # Asegurarnos de que no sea un año tampoco en el fallback final
+                # Buscar sección "Anuncios de" para inferir multi-host
+                page_text_lower = dom_data.get("page_text", "").lower()
+                if "anuncios de " in page_text_lower or "listings by " in page_text_lower:
+                    host_listings_count = 3 # Multihost inferido
+                else:
+                    host_listings_count = 1
         if 2020 <= host_listings_count <= 2030:
             host_listings_count = 1
+            
+        # Navegar al perfil del anfitrión si parece tener 1 solo anuncio, para asegurarnos
+        if host_listings_count == 1:
+            host_profile_url = dom_data.get("hostProfileUrl")
+            if host_profile_url:
+                print(f"Navegando al perfil del anfitrión para confirmar anuncios: {host_profile_url}", file=sys.stderr)
+                try:
+                    # En algunos casos el enlace puede ser relativo
+                    if host_profile_url.startswith('/'):
+                        host_profile_url = "https://www.airbnb.es" + host_profile_url
+                    await page.goto(host_profile_url, wait_until="domcontentloaded", timeout=20000)
+                    await page.wait_for_timeout(3000)
+                    profile_html = await page.content()
+                    
+                    # Buscar número exacto en el perfil (ej. ">28 anuncios<")
+                    regex_profile = re.search(r'>\s*(\d+)\s*(?:anuncio|anuncios|listings|listing)\s*<', profile_html, re.IGNORECASE)
+                    if regex_profile:
+                        val = int(regex_profile.group(1))
+                        if not (2020 <= val <= 2030):
+                            host_listings_count = val
+                    else:
+                        # Fallback en el DOM de texto del perfil
+                        profile_text = await page.evaluate("document.body.innerText || ''")
+                        match_profile = re.search(r'(\d+)\s*(?:anuncios|listings)', profile_text, re.IGNORECASE)
+                        if match_profile:
+                            val = int(match_profile.group(1))
+                            if not (2020 <= val <= 2030):
+                                host_listings_count = val
+                except Exception as e:
+                    print(f"Error visitando perfil: {e}", file=sys.stderr)
+        
+        await browser.close()
                 
         # Procesar precio
         price_total = dom_data.get("priceTotalVal")
