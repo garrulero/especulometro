@@ -23,13 +23,11 @@ Este proyecto no es un simple cuaderno de análisis; es una solución de softwar
 
 ---
 
-## 🧠 El Motor Predictivo: Enfoque Modular
+## 🧠 El Motor Predictivo: El Especulómetro
 
-Para abordar un problema complejo y multivariable como la gentrificación, el sistema fue concebido con una arquitectura predictiva en cascada compuesta por tres módulos. **Actualmente, en esta versión MVP de producción, solo el Módulo 1 se encuentra activo y en funcionamiento:**
+Para abordar un problema complejo y multivariable como la gentrificación, el sistema se apoya en un potente modelo de Machine Learning especializado:
 
-* **🟢 Módulo 1: El Especulómetro (Activo):** Clasificador Random Forest que analiza el vector de entrada y determina la probabilidad de que el anuncio pertenezca a un particular o a un Gran Tenedor / Fondo Comercial (multi-host), detectando operaciones profesionalizadas bajo el radar.
-* **🟡 Módulo 2: El Cazapiratas (Inactivo/Experimental):** Clasificador XGBoost diseñado para evaluar el riesgo conductual y administrativo (ej. detección de fraudes en licencias turísticas).
-* **🟡 Módulo 3: El Oráculo Urbano (Inactivo/Experimental):** Regresor RF concebido como modelo maestro para predecir el impacto inflacionista exacto (+€/m²) en los contratos de alquiler residencial.
+* **Clasificador Random Forest (El Especulómetro):** Analiza el vector de entrada (características del alojamiento, tarifas, disponibilidad, y procesamiento NLP de las descripciones) y determina la probabilidad de que el anuncio pertenezca a un particular o a un Gran Tenedor / Fondo Comercial. Esto permite detectar de forma automática operaciones profesionalizadas (multi-host) que actúan bajo el radar, revelando su impacto real en el mercado inmobiliario local.
 
 ---
 
@@ -88,9 +86,9 @@ En la raíz del proyecto encontrarás la secuencia de experimentación que dio o
 - `01_Fuentes.ipynb`: Ingesta de datos desde portales y bases de datos del Eustat.
 - `02_LimpiezaEDA.ipynb`: Análisis Exploratorio (EDA) y curación del dataset.
 - `03_Entrenamiento_Evaluacion.ipynb`: Configuración base y validación de features.
-- `04_Modelo_Especulometro.ipynb`: Entrenamiento del Módulo 1 (Clasificador RF) - **Activo en producción**.
-- `05_Modelo_Cazapiratas.ipynb`: Entrenamiento del Módulo 2 (XGBoost) - *Prueba de concepto / Inactivo*.
-- `06_Modelo_OraculoUrbano.ipynb`: Entrenamiento del Módulo 3 (Oráculo) - *Prueba de concepto / Inactivo*.
+- `04_Modelo_Especulometro.ipynb`: Entrenamiento del modelo predictivo principal (Clasificador RF).
+- `05_Modelo_Cazapiratas.ipynb`: Pruebas algorítmicas adicionales (XGBoost).
+- `06_Modelo_OraculoUrbano.ipynb`: Investigaciones experimentales sobre impacto inflacionista.
 
 ---
 
