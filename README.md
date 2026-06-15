@@ -94,5 +94,16 @@ En la raíz del proyecto encontrarás la secuencia de experimentación que dio o
 
 ---
 
-## 📖 Manual de Usuario
-Para aprender a utilizar todas las funcionalidades de la aplicación (auditoría de URLs, control manual, simulación y comprensión de los módulos IA), consulta el documento **[GUIA.md](./GUIA.md)**.
+## 📚 Documentación Adicional y Ecosistema
+
+### Uso Práctico de la Aplicación (Manual de Usuario)
+El presente README delega expresamente la explicación sobre cómo realizar una auditoría de URLs, usar el control manual o interpretar los módulos a un documento separado llamado **[GUIA.md](./GUIA.md)**. Es en la GUIA.md donde realmente se explica cómo usar el dashboard interactivo y entender las métricas de desplazamiento comunitario.
+
+### Detalles Específicos de Desarrollo Frontend
+Existe un archivo **[front/README.md](./front/README.md)** dedicado exclusivamente a las instrucciones de desarrollo de la interfaz en Next.js, la gestión de fuentes (Geist) y la documentación oficial para desplegar la web en la plataforma Vercel.
+
+### Ecosistema de Scraping e Ingeniería Inversa
+El repositorio contiene docenas de scripts de experimentación en la carpeta `front/` (como `scratch_scrape.py`, `scratch_booking_ldjson.py`, `scratch_playwright_test.py`, `scratch_extract_details.py`, etc.). El README principal abstrae este complejo trabajo oculto de extracción de datos de portales y pruebas de API, que forma el pilar de la ingesta de datos en tiempo real.
+
+### Documentación de Desarrollo Interno
+Dentro del repositorio también existen archivos de contexto para IA (como **[AGENTS.md](./front/AGENTS.md)** y **[CLAUDE.md](./front/CLAUDE.md)** en el directorio `front/`) y una carpeta de material visual (**presentaciones/**) que no se referencian en absoluto en el README principal pero forman parte del proceso de desarrollo.
