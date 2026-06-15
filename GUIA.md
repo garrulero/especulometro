@@ -53,7 +53,7 @@ Cualquier cambio que realices en estos controles actualizará instantáneamente 
 
 ## 4. El Motor Predictivo: Módulos de Análisis
 
-Una vez ingresados los datos (vía URL o manualmente), el sistema despliega el resultado de sus tres módulos predictivos principales.
+Una vez ingresados los datos (vía URL o manualmente), el sistema procesa la información y despliega los resultados del modelo predictivo activo (Módulo 1) junto con el análisis de impacto y el diagnóstico por IA.
 
 ### Módulo 1: El Especulómetro
 
